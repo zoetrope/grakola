@@ -1,0 +1,16 @@
+domain: zoetrope.github.io
+layout:
+- go.kubebuilder.io/v3
+projectName: grakola
+repo: github.com/zoetrope/grakola
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: zoetrope.github.io
+  group: grakola
+  kind: Tenant
+  path: github.com/zoetrope/grakola/api/v1
+  version: v1
+version: "3"
