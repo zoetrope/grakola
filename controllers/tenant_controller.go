@@ -52,7 +52,7 @@ type TenantReconciler struct {
 //+kubebuilder:rbac:groups=grakola.zoetrope.github.io,resources=tenants,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=grakola.zoetrope.github.io,resources=tenants/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=grakola.zoetrope.github.io,resources=tenants/finalizers,verbs=update
-//TODO: add certificate, issuer, secret
+//TODO: add certificate, issuer, secret, statefulset, service
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -84,6 +84,14 @@ func (r *TenantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, err
 	}
 	err = r.reconcileKubeConfig(ctx, tenant)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	err = r.reconcileEtcd(ctx, tenant)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	err = r.reconcileAPIServer(ctx, tenant)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
