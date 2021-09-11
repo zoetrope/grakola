@@ -36,10 +36,24 @@ spec:
           spec:
             description: TenantSpec defines the desired state of Tenant
             properties:
-              foo:
-                description: Foo is an example field of Tenant. Edit tenant_types.go
-                  to remove/update
-                type: string
+              targets:
+                items:
+                  description: GroupVersionKind unambiguously identifies a kind.  It
+                    doesn't anonymously include GroupVersion to avoid automatic coersion.  It
+                    doesn't use a GroupVersion to avoid custom marshalling
+                  properties:
+                    group:
+                      type: string
+                    kind:
+                      type: string
+                    version:
+                      type: string
+                  required:
+                  - group
+                  - kind
+                  - version
+                  type: object
+                type: array
             type: object
           status:
             description: TenantStatus defines the observed state of Tenant

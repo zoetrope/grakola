@@ -1,4 +1,4 @@
-package controllers
+package constants
 
 const (
 	CertificateKind = "Certificate"
@@ -8,7 +8,8 @@ const (
 const MetaPrefix = "grakola.zoetrope.github.io/"
 
 const (
-	TenantControllerName = "tenant-controller"
+	TenantControllerName    = "tenant-controller"
+	PropagateControllerName = "propagate-controller"
 )
 
 const (

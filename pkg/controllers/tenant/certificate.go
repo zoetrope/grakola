@@ -1,7 +1,9 @@
-package controllers
+package tenant
 
 import (
 	"context"
+
+	"github.com/zoetrope/grakola/pkg/constants"
 
 	grakolav1 "github.com/zoetrope/grakola/api/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -13,7 +15,7 @@ import (
 func (r *TenantReconciler) createSelfSignedIssuer(ctx context.Context, tenant *grakolav1.Tenant) error {
 	issuerName := tenant.Name + "-selfsigned-issuer"
 	obj := &unstructured.Unstructured{}
-	obj.SetGroupVersionKind(certManagerGroupVersion.WithKind(IssuerKind))
+	obj.SetGroupVersionKind(certManagerGroupVersion.WithKind(constants.IssuerKind))
 	obj.SetName(issuerName)
 	obj.SetNamespace(tenant.Namespace)
 	obj.UnstructuredContent()["spec"] = map[string]interface{}{
@@ -25,14 +27,14 @@ func (r *TenantReconciler) createSelfSignedIssuer(ctx context.Context, tenant *g
 	}
 	return r.Patch(ctx, obj, client.Apply, &client.PatchOptions{
 		Force:        pointer.BoolPtr(true),
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 	})
 }
 
 func (r *TenantReconciler) createIssuer(ctx context.Context, tenant *grakolav1.Tenant, name string) error {
 	issuerName := tenant.Name + "-" + name + "-issuer"
 	obj := &unstructured.Unstructured{}
-	obj.SetGroupVersionKind(certManagerGroupVersion.WithKind(IssuerKind))
+	obj.SetGroupVersionKind(certManagerGroupVersion.WithKind(constants.IssuerKind))
 	obj.SetName(issuerName)
 	obj.SetNamespace(tenant.Namespace)
 	obj.UnstructuredContent()["spec"] = map[string]interface{}{
@@ -46,7 +48,7 @@ func (r *TenantReconciler) createIssuer(ctx context.Context, tenant *grakolav1.T
 	}
 	return r.Patch(ctx, obj, client.Apply, &client.PatchOptions{
 		Force:        pointer.BoolPtr(true),
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 	})
 }
 
@@ -63,7 +65,7 @@ func caCert(name, issuer string) map[string]interface{} {
 		"secretName": name,
 		"privateKey": privateKey,
 		"issuerRef": map[string]interface{}{
-			"kind": IssuerKind,
+			"kind": constants.IssuerKind,
 			"name": issuer,
 		},
 	}
@@ -84,7 +86,7 @@ func serverCert(name, issuer string, dnsNames, ipAddresses []string) map[string]
 		"ipAddresses": ipAddresses,
 		"privateKey":  privateKey,
 		"issuerRef": map[string]interface{}{
-			"kind": IssuerKind,
+			"kind": constants.IssuerKind,
 			"name": issuer,
 		},
 	}
@@ -107,7 +109,7 @@ func clientCert(name, issuer, user, subject string) map[string]interface{} {
 		},
 		"privateKey": privateKey,
 		"issuerRef": map[string]interface{}{
-			"kind": IssuerKind,
+			"kind": constants.IssuerKind,
 			"name": issuer,
 		},
 	}
@@ -115,7 +117,7 @@ func clientCert(name, issuer, user, subject string) map[string]interface{} {
 
 func (r *TenantReconciler) createCertificate(ctx context.Context, tenant *grakolav1.Tenant, name string, spec map[string]interface{}) error {
 	obj := &unstructured.Unstructured{}
-	obj.SetGroupVersionKind(certManagerGroupVersion.WithKind(CertificateKind))
+	obj.SetGroupVersionKind(certManagerGroupVersion.WithKind(constants.CertificateKind))
 	obj.SetName(name)
 	obj.SetNamespace(tenant.Namespace)
 	obj.UnstructuredContent()["spec"] = spec
@@ -125,6 +127,6 @@ func (r *TenantReconciler) createCertificate(ctx context.Context, tenant *grakol
 	}
 	return r.Patch(ctx, obj, client.Apply, &client.PatchOptions{
 		Force:        pointer.BoolPtr(true),
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 	})
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controllers
+package tenant
 
 import (
 	"bytes"
@@ -92,6 +92,10 @@ func (r *TenantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, err
 	}
 	err = r.reconcileAPIServer(ctx, tenant)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	err = r.reconcilePropagateController(ctx, tenant)
 	if err != nil {
 		return ctrl.Result{}, err
 	}

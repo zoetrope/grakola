@@ -1,8 +1,10 @@
-package controllers
+package tenant
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/zoetrope/grakola/pkg/constants"
 
 	grakolav1 "github.com/zoetrope/grakola/api/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -188,13 +190,13 @@ func (r *TenantReconciler) reconcileAPIServerStatefulSet(ctx context.Context, te
 		Object: obj,
 	}
 
-	var current appsv1.Deployment
+	var current appsv1.StatefulSet
 	err = r.Get(ctx, client.ObjectKey{Namespace: tenant.Namespace, Name: stsName}, &current)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 
-	currApplyConfig, err := appsv1apply.ExtractDeployment(&current, TenantControllerName)
+	currApplyConfig, err := appsv1apply.ExtractStatefulSet(&current, constants.TenantControllerName)
 	if err != nil {
 		return err
 	}
@@ -204,7 +206,7 @@ func (r *TenantReconciler) reconcileAPIServerStatefulSet(ctx context.Context, te
 	}
 
 	err = r.Patch(ctx, patch, client.Apply, &client.PatchOptions{
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 		Force:        pointer.Bool(true),
 	})
 
@@ -253,7 +255,7 @@ func (r *TenantReconciler) reconcileAPIServerService(ctx context.Context, tenant
 		return err
 	}
 
-	currApplyConfig, err := corev1apply.ExtractService(&current, TenantControllerName)
+	currApplyConfig, err := corev1apply.ExtractService(&current, constants.TenantControllerName)
 	if err != nil {
 		return err
 	}
@@ -263,7 +265,7 @@ func (r *TenantReconciler) reconcileAPIServerService(ctx context.Context, tenant
 	}
 
 	err = r.Patch(ctx, patch, client.Apply, &client.PatchOptions{
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 		Force:        pointer.Bool(true),
 	})
 	if err != nil {
@@ -292,9 +294,9 @@ func ownerRef(tenant *grakolav1.Tenant, scheme *runtime.Scheme) (*metav1apply.Ow
 
 func labelSet(app string, tenant *grakolav1.Tenant) map[string]string {
 	labels := map[string]string{
-		LabelAppName:      app,
-		LabelAppInstance:  tenant.Name,
-		LabelAppCreatedBy: TenantControllerName,
+		constants.LabelAppName:      app,
+		constants.LabelAppInstance:  tenant.Name,
+		constants.LabelAppCreatedBy: constants.TenantControllerName,
 	}
 	return labels
 }

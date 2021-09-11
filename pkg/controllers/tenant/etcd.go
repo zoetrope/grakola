@@ -1,8 +1,10 @@
-package controllers
+package tenant
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/zoetrope/grakola/pkg/constants"
 
 	grakolav1 "github.com/zoetrope/grakola/api/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -179,7 +181,7 @@ func (r *TenantReconciler) reconcileEtcdStatefulSet(ctx context.Context, tenant 
 		return err
 	}
 
-	currApplyConfig, err := appsv1apply.ExtractDeployment(&current, TenantControllerName)
+	currApplyConfig, err := appsv1apply.ExtractDeployment(&current, constants.TenantControllerName)
 	if err != nil {
 		return err
 	}
@@ -189,7 +191,7 @@ func (r *TenantReconciler) reconcileEtcdStatefulSet(ctx context.Context, tenant 
 	}
 
 	err = r.Patch(ctx, patch, client.Apply, &client.PatchOptions{
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 		Force:        pointer.Bool(true),
 	})
 
@@ -233,7 +235,7 @@ func (r *TenantReconciler) reconcileEtcdService(ctx context.Context, tenant *gra
 		return err
 	}
 
-	currApplyConfig, err := corev1apply.ExtractService(&current, TenantControllerName)
+	currApplyConfig, err := corev1apply.ExtractService(&current, constants.TenantControllerName)
 	if err != nil {
 		return err
 	}
@@ -243,7 +245,7 @@ func (r *TenantReconciler) reconcileEtcdService(ctx context.Context, tenant *gra
 	}
 
 	err = r.Patch(ctx, patch, client.Apply, &client.PatchOptions{
-		FieldManager: TenantControllerName,
+		FieldManager: constants.TenantControllerName,
 		Force:        pointer.Bool(true),
 	})
 	if err != nil {

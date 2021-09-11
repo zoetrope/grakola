@@ -60,14 +60,20 @@ test: manifests generate fmt vet ## Run tests.
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/manager main.go
 
-run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./main.go
+run: ## Run a controller from your host.
+	go run ./cmd/grakola-controller/main.go
 
 docker-build: test ## Build docker image with the manager.
-	docker build -t ${IMG} .
+	docker build -t grakola-controller:latest .
 
-docker-push: ## Push docker image with the manager.
-	docker push ${IMG}
+docker-build-propagate: ## Build docker image with the manager.
+	docker build -t propagate-controller:latest -f Dockerfile.propagate .
+
+docker-load:
+	kind load docker-image grakola-controller:latest
+
+docker-load-propagate:
+	kind load docker-image propagate-controller:latest
 
 ##@ Deployment
 
